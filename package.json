@@ -1,6 +1,6 @@
 {
   "name": "@bbqaaq/fonteditor-core",
-  "version": "1.0.3",
+  "version": "1.0.3-beta",
   "description": "fonts (ttf, woff, eot, svg, otf) parse, write, transform. glyph adjust.",
   "keywords": [
     "sfnt",
