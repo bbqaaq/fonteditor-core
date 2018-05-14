@@ -23,7 +23,9 @@ define(
             'loca',
             'maxp',
             'name',
-            'post'
+            'post',
+            'GPOS',
+            // 'GSUB',
         ];
 
 

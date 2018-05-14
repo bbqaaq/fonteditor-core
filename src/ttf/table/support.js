@@ -20,7 +20,9 @@ define(
             'fpgm': require('./fpgm'),
             'cvt': require('./cvt'),
             'prep': require('./prep'),
-            'gasp': require('./gasp')
+            'gasp': require('./gasp'),
+            'GPOS': require('./GPOS'),
+            // 'GSUB': require('./GSUB'),
         };
 
         return support;
