@@ -6,19 +6,18 @@
 
 
 
-// var readWindowsAllCodes = require('../../util/readWindowsAllCodes');
-
+/*  start of script list  */
 function readLangSysRecord(reader, ttf, langSysRecordOffset) {
     let langSysRecord = {}
     let offset = langSysRecordOffset
 
-    langSysRecord.lookupOrder = reader.readUint16(offset)
-    langSysRecord.requiredFeatureIndex = reader.readUint16(offset + 2)
+    langSysRecord.reserved = reader.readUint16(offset)
+    langSysRecord.reqFeatureIndex = reader.readUint16(offset + 2)
     let featureIndexCount = reader.readUint16(offset + 4)
-    langSysRecord.featureIndices = []
+    langSysRecord.featureIndexes = []
     let featureIndexOffset = offset + 6
     for (var i = 0; i < featureIndexCount; i++) {
-        langSysRecord.featureIndices.push(reader.readUint16(featureIndexOffset))
+        langSysRecord.featureIndexes.push(reader.readUint16(featureIndexOffset))
 
         featureIndexOffset += 2
     }
@@ -32,19 +31,23 @@ function readScriptTable(reader, ttf, scriptTableOffset) {
 
     //  TODO: NULL HERE?
     let defaultLangSysOffset = reader.readUint16(offset)
-    let langSysCount = reader.readUint16(offset + 2)
+    if (defaultLangSysOffset !== 0) {
+        scriptTable.defaultLangSys = readLangSysRecord(reader, ttf, scriptTableOffset + defaultLangSysOffset)
+    }
 
-    scriptTable.defaultLangSys = readLangSysRecord(reader, ttf, scriptTableOffset + defaultLangSysOffset)
+    let langSysCount = reader.readUint16(offset + 2)
 
     let langSysRecords = []
     offset = scriptTableOffset + 4
     for (var i = 0; i < langSysCount; i++) {
+        let langSysRecord = {}
         let langSysTag = reader.readString(offset, 4)
         let langSysOffset = reader.readUint16(offset + 4)
         langSysRecordOffset = scriptTableOffset + langSysOffset
 
-        let langSysRecord = readLangSysRecord(reader, ttf, langSysRecordOffset)
+        langSys = readLangSysRecord(reader, ttf, langSysRecordOffset)
         langSysRecord.tag = langSysTag
+        langSysRecord.langSys = langSys
         langSysRecords.push(langSysRecord)
         offset += 6
     }
@@ -60,7 +63,7 @@ function readScriptRecord(reader, ttf, scriptListOffset, scriptRecordOffset) {
     scriptRecord.tag = reader.readString(offset, 4)
     let scriptOffset = reader.readUint16(offset + 4)
 
-    scriptRecord.scriptTable = readScriptTable(reader, ttf, scriptListOffset + scriptOffset)
+    scriptRecord.script = readScriptTable(reader, ttf, scriptListOffset + scriptOffset)
 
     return scriptRecord
 }
@@ -81,9 +84,12 @@ function readScriptList(reader, ttf, scriptListOffset) {
 
     return scriptList
 }
-
+/*  end of script list  */
 
 function parse(reader, ttf) {
+    // let gposBytes = reader.readBytes(this.offset, 48)
+    // console.log('gposBytes = ', gposBytes)
+
     var tgpos = {}
     var offset = this.offset
 
@@ -93,8 +99,10 @@ function parse(reader, ttf) {
     let featureListOffset = offset +  reader.readUint16()
     let lookupListOffset = offset + reader.readUint16()
 
+
+
     let scriptList = readScriptList(reader, ttf, scriptListOffset)
-    console.log('scriptList = ', JSON.stringify(scriptList, null, 2))
+    tgpos.scripts = scriptList
 
     return tgpos;
 }

@@ -9,25 +9,16 @@
 
 var table = require('./table');
 var parse = require('./gpos/parse.js')
+var write = require('./gpos/write.js')
+var sizeof = require('./gpos/sizeof.js')
 
 var GPOS = table.create(
     'GPOS',
     [],
     {
-
         read: parse,
-        
-        /*
-        write: function (writer, ttf) {
-            if (ttf.GPOS) {
-                writer.writeBytes(ttf.GPOS, ttf.GPOS.length);
-            }
-        },
-
-        size: function (ttf) {
-            return ttf.GPOS ? ttf.GPOS.length : 0;
-        }
-        */
+        write: write,
+        size: sizeof
     }
 );
 
